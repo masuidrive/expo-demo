@@ -1,4 +1,4 @@
-# expo-template
+# tiktok-ui
 
 Expo + EAS Update + Claude Code による効率的なモバイルアプリ開発テンプレート
 
