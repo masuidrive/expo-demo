@@ -1,0 +1,36 @@
+name: EAS Build Android (on merge to main)
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  build_android:
+    # Run only if PR was merged AND has 'native' label
+    if: |
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.body, '[dist-dev-client]')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: APPNAME
+    steps:
+      # merge 後の main をビルドしたいので main をcheckout
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: APPNAME/package-lock.json
+
+      - run: npm ci
+      - run: npm run verify
+
+      - name: EAS Build (Android)
+        run: npx eas-cli@latest build -p android --profile dev --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
