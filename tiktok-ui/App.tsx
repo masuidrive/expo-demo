@@ -26,6 +26,28 @@ const generateImages = (count: number): ImageItem[] => {
   }));
 };
 
+// Separate component for image item to properly use hooks
+function ImageItemComponent({ item }: { item: ImageItem }) {
+  const [imageLoading, setImageLoading] = useState(true);
+
+  return (
+    <View style={styles.imageContainer}>
+      {imageLoading && (
+        <View style={styles.imageLoadingContainer}>
+          <ActivityIndicator size="large" color="#ffffff" />
+        </View>
+      )}
+      <Image
+        source={{ uri: item.uri }}
+        style={styles.image}
+        resizeMode="cover"
+        onLoadStart={() => setImageLoading(true)}
+        onLoadEnd={() => setImageLoading(false)}
+      />
+    </View>
+  );
+}
+
 export default function App() {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,24 +102,7 @@ export default function App() {
   }).current;
 
   const renderItem = ({ item, index }: { item: ImageItem; index: number }) => {
-    const [imageLoading, setImageLoading] = useState(true);
-
-    return (
-      <View style={styles.imageContainer}>
-        {imageLoading && (
-          <View style={styles.imageLoadingContainer}>
-            <ActivityIndicator size="large" color="#ffffff" />
-          </View>
-        )}
-        <Image
-          source={{ uri: item.uri }}
-          style={styles.image}
-          resizeMode="cover"
-          onLoadStart={() => setImageLoading(true)}
-          onLoadEnd={() => setImageLoading(false)}
-        />
-      </View>
-    );
+    return <ImageItemComponent item={item} />;
   };
 
   if (loading) {
